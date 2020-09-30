@@ -69,7 +69,7 @@ class OrderService
 
         $reqOrderItem['order_id']    = $order->id;
 
-        for ($i = 0; $i <= sizeof($request->order_items)-1; $i++) {
+        for ($i = 0; $i < sizeof($request->order_items); $i++) {
             $reqOrderItem['product_id']  = $request->order_items[$i]['product_id'];
             $reqOrderItem['quantity']    = $request->order_items[$i]['quantity'];
             $reqOrderItem['total_value'] = $request->order_items[$i]['total_value'];
