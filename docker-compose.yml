@@ -1,0 +1,53 @@
+version: "3.3"
+services:
+
+  app:
+    build:
+      args:
+        user: sammy
+        uid: 1000
+      context: ./
+      dockerfile: docker/dev/Dockerfile
+    container_name: api_laravel
+    restart: unless-stopped
+    working_dir: /var/www/
+    volumes:
+      - .:/var/www
+      - ./:/usr/share/nginx
+    networks:
+      - app-network
+
+  db:
+    image: mysql:8.0.17
+    container_name: api_laravel_db
+    restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    volumes:
+      - .docker/dbdata:/var/lib/mysql
+    ports:
+      - "${DB_PORT}:3306"
+    networks:
+      - app-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: api_laravel_nginx
+    restart: unless-stopped
+    ports:
+      - "3030:80"
+    volumes:
+      - .:/var/www
+      - ./docker/nginx:/etc/nginx/conf.d/
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
